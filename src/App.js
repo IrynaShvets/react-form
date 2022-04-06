@@ -1,4 +1,92 @@
-import React, { Component } from 'react';
+import { useState } from 'react';
+import Form from './components/Form/Form';
+import shortid from 'shortid';
+import TodoList from './components/TodoList/TodoList';
+import TodoEditor from './components/TodoEditor/TodoEditor';
+import Filter from './components/Filter/Filter';
+import Container from './components/Container/Container';
+import initialTodos from './todos.json';
+
+function App() {
+  const [todos, setTodos] = useState(initialTodos);
+  const [filter, setFilter] = useState('');
+
+  const addTodo = text => {
+    const todo = {
+      id: shortid.generate(),
+      text,
+      completed: false,
+    };
+
+    setTodos(todos => [todo, ...todos]);
+  };
+
+  const deleteTodo = todoId => {
+    setTodos(todos.filter(todo => todo.id !== todoId));
+  };
+
+  const formSubmitHandler = data => {
+    setTimeout(() => {
+      console.log(data);
+    }, 1000);
+  };
+
+  const toggleCompleted = todoId => {
+    setTodos(todos =>
+      todos.map(todo =>
+        todo.id === todoId ? { ...todo, completed: !todo.completed } : todo,
+      ),
+    );
+  };
+
+  const changeFilter = e => {
+    setFilter(e.currentTarget.value);
+  };
+
+  const getVisibleTodos = () => {
+    const normalizedFilter = filter.toLowerCase();
+    return todos.filter(todo =>
+      todo.text.toLowerCase().includes(normalizedFilter),
+    );
+  };
+
+  const calculateCompletedTodos = () => {
+    return todos.reduce(
+      (total, todo) => (todo.completed ? total + 1 : total),
+      0,
+    );
+  };
+
+  const totalTodoCount = todos.length;
+  const completedTodoCount = calculateCompletedTodos();
+  const visibleTodos = getVisibleTodos();
+
+  return (
+    <Container>
+      <Form onSubmitChange={formSubmitHandler} />
+      <div>
+        <p>Всего заметок: {totalTodoCount}</p>
+        <p>Выполнено: {completedTodoCount}</p>
+      </div>
+
+      <TodoEditor onSubmit={addTodo} />
+
+      <Filter value={filter} onChange={changeFilter} />
+
+      <TodoList
+        todos={visibleTodos}
+        onDeleteTodo={deleteTodo}
+        onToggleCompleted={toggleCompleted}
+      />
+    </Container>
+  );
+}
+
+export default App;
+
+//class
+
+/* import React, { Component } from 'react';
 import Form from './components/Form/Form';
 import shortid from 'shortid';
 import TodoList from './components/TodoList/TodoList';
@@ -88,7 +176,6 @@ class App extends Component {
 
     return (
       <Container>
-        {/* TODO: вынести в отдельный компонент */}
         <Form onSubmitChange={this.formSubmitHandler} />
         <div>
           <p>Всего заметок: {totalTodoCount}</p>
@@ -110,3 +197,5 @@ class App extends Component {
 }
 
 export default App;
+
+ */
